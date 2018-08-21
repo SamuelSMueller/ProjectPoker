@@ -19,9 +19,8 @@ void createroom::on_pushButton_clicked()
     QString roomname = ui->lineEdit_2->text();
     qDebug() << roomname;
     close();
-    pokerroom pkRm;
-    pkRm.setModal(true);
-    pkRm.exec();
+    pokerroom * pkRm = new pokerroom;
+    pkRm->show();
 }
 
 void createroom::on_pushButton_2_clicked()

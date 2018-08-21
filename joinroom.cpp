@@ -20,14 +20,14 @@ void joinroom::on_pushButton_clicked()
     //QString roomname = ui->lineEdit_2->text();
     //qDebug() << roomname;
     close();
-    pokerroom pkRm;
-    pkRm.setModal(true);
-    pkRm.exec();
+    pokerroom * pkRm = new pokerroom;
+    pkRm->show();
 }
 
 void joinroom::on_pushButton_2_clicked()
 {
-    MainWindow * mainWindow = new MainWindow;
-    mainWindow->show();
-    close();
+        MainWindow * mainWindow = new MainWindow;
+        mainWindow->show();
+        close();
+
 }
