@@ -15,6 +15,9 @@ public:
     explicit joinroom(QWidget *parent = nullptr);
     ~joinroom();
 
+private slots:
+    void on_pushButton_2_clicked();
+
 private:
     Ui::joinroom *ui;
 };
