@@ -1,0 +1,13 @@
+Familiarize self with Github/Git commands
+Create Repo
+Look at similar projects what (and why) others have done things the way they have (i.e. Fibonacci Sequence)
+Decide what features I want, what features are implied by having those features
+Wireframe/mockup for project GUI, add notes for specific features/functions
+Decide what tools I will be using (C++ is strongest language, find good GUI engine/IDE for C++ -> QT)
+Install QT, research basic functions and creation of GUI applications
+Link project folder to git repo
+Begin programming, learn to make one window appear
+Add buttons to main window (incorrect?)
+Buttons appear to be incorrect size and window is too small
+Research layout functionality and best-use practices for user input (textfield/buttons - signal and slot concepts)
+-stopped to fix dryer, back into workflow-
