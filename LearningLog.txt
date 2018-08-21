@@ -11,3 +11,5 @@ Add buttons to main window (incorrect?)
 Buttons appear to be incorrect size and window is too small
 Research layout functionality and best-use practices for user input (textfield/buttons - signal and slot concepts)
 -stopped to fix dryer, back into workflow-
+corrected previous issues with buttons and layout sizing, first page ui complete
+stop for the night
