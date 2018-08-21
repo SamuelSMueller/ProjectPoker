@@ -2,6 +2,7 @@
 #define JOINROOM_H
 
 #include <QDialog>
+#include <QDebug>
 
 namespace Ui {
 class joinroom;
@@ -17,6 +18,8 @@ public:
 
 private slots:
     void on_pushButton_2_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::joinroom *ui;

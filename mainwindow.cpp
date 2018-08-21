@@ -17,7 +17,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+    QString username = ui->lineEdit->text();
+    qDebug() << username;
     createroom crRm;
+    close();
     crRm.setModal(true);
     crRm.exec();
 
@@ -25,7 +28,11 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
+    QString username = ui->lineEdit->text();
+    qDebug() << username;
     joinroom jnRm;
+    close();
     jnRm.setModal(true);
     jnRm.exec();
+
 }
