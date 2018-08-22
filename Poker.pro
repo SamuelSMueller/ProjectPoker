@@ -30,7 +30,8 @@ SOURCES += \
     pokerserver.cpp \
     serverStuff.cpp \
     pokerclient.cpp \
-    clientStuff.cpp
+    clientStuff.cpp \
+    info.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -39,7 +40,8 @@ HEADERS += \
     pokerserver.h \
     serverStuff.h \
     pokerclient.h \
-    clientStuff.h
+    clientStuff.h \
+    info.h
 
 FORMS += \
         mainwindow.ui \

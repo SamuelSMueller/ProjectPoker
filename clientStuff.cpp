@@ -1,4 +1,5 @@
 #include "clientStuff.h"
+#include "info.h"
 
 ClientStuff::ClientStuff(
         const QString hostAddress,
@@ -23,7 +24,7 @@ void ClientStuff::connect2host()
 {
     timeoutTimer->start(3000);
 
-    tcpSocket->connectToHost(host, port);
+    tcpSocket->connectToHost(netInfo, portInfo);
     connect(tcpSocket, &QTcpSocket::connected, this, &ClientStuff::connected);
     connect(tcpSocket, &QTcpSocket::readyRead, this, &ClientStuff::readyRead);
 }

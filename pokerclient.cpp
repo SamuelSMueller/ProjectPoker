@@ -1,6 +1,7 @@
 #include "pokerclient.h"
 #include "ui_pokerclient.h"
 #include "mainwindow.h"
+#include "info.h"
 
 pokerclient::pokerclient(QWidget *parent) :
     QDialog(parent),
@@ -10,7 +11,7 @@ pokerclient::pokerclient(QWidget *parent) :
 
     ui->pushButton_disconnect->setVisible(false);
 
-    client = new ClientStuff("localhost", 6547);
+    client = new ClientStuff(netInfo, portInfo);
 
     setStatus(client->getStatus());
 

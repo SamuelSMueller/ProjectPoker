@@ -2,6 +2,7 @@
 #include "ui_createroom.h"
 #include "pokerserver.h"
 #include "mainwindow.h"
+
 createroom::createroom(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::createroom)
