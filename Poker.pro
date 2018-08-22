@@ -27,19 +27,26 @@ SOURCES += \
         mainwindow.cpp \
     createroom.cpp \
     joinroom.cpp \
-    pokerroom.cpp
+    pokerserver.cpp \
+    serverStuff.cpp \
+    pokerclient.cpp \
+    clientStuff.cpp
 
 HEADERS += \
     mainwindow.h \
     createroom.h \
     joinroom.h \
-    pokerroom.h
+    pokerserver.h \
+    serverStuff.h \
+    pokerclient.h \
+    clientStuff.h
 
 FORMS += \
         mainwindow.ui \
     createroom.ui \
     joinroom.ui \
-    pokerroom.ui
+    pokerserver.ui \
+    pokerclient.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

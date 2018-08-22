@@ -1,6 +1,6 @@
 #include "joinroom.h"
 #include "ui_joinroom.h"
-#include "pokerroom.h"
+#include "pokerclient.h"
 #include "mainwindow.h"
 
 joinroom::joinroom(QWidget *parent) :
@@ -20,8 +20,8 @@ void joinroom::on_pushButton_clicked()
     //QString roomname = ui->lineEdit_2->text();
     //qDebug() << roomname;
     close();
-    pokerroom * pkRm = new pokerroom;
-    pkRm->show();
+    pokerclient * pkCl = new pokerclient;
+    pkCl->show();
 }
 
 void joinroom::on_pushButton_2_clicked()

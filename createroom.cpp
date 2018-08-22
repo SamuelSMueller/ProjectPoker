@@ -1,6 +1,6 @@
 #include "createroom.h"
 #include "ui_createroom.h"
-#include "pokerroom.h"
+#include "pokerserver.h"
 #include "mainwindow.h"
 createroom::createroom(QWidget *parent) :
     QDialog(parent),
@@ -19,7 +19,7 @@ void createroom::on_pushButton_clicked()
     QString roomname = ui->lineEdit_2->text();
     qDebug() << roomname;
     close();
-    pokerroom * pkRm = new pokerroom;
+    pokerserver * pkRm = new pokerserver;
     pkRm->show();
 }
 
