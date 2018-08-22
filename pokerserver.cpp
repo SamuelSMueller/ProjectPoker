@@ -1,5 +1,6 @@
 #include "pokerserver.h"
 #include "ui_pokerserver.h"
+#include "mainwindow.h"
 
 pokerserver::pokerserver(QWidget *parent) :
     QDialog(parent),
@@ -91,4 +92,12 @@ void pokerserver::smbDisconnectedFromServer()
 void pokerserver::gotNewMesssage(QString msg)
 {
     ui->textEdit_log->append(QString("New message: %1").arg(msg));
+}
+
+void pokerserver::on_pushButton_Exit_clicked()
+{
+    on_pushButton_stopServer_clicked();
+    MainWindow * mainWindow = new MainWindow;
+    mainWindow->show();
+    close();
 }

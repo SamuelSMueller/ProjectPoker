@@ -25,6 +25,8 @@ private slots:
     void smbDisconnectedFromServer();
     void gotNewMesssage(QString msg);
 
+    void on_pushButton_Exit_clicked();
+
 private:
     Ui::pokerserver *ui;
     ServerStuff *server;

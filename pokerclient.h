@@ -27,6 +27,8 @@ private slots:
     void on_pushButton_connect_clicked();
     void on_pushButton_disconnect_clicked();
 
+    void on_pushButton_Exit_clicked();
+
 private:
     Ui::pokerclient *ui;
     ClientStuff *client;

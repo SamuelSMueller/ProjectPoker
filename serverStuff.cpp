@@ -20,7 +20,7 @@ void ServerStuff::newConnection()
 
     clients << clientSocket;
 
-    sendToClient(clientSocket, "Reply: connection established");
+    sendToClient(clientSocket, "---Joined Room---");
 }
 
 void ServerStuff::readClient()
@@ -28,7 +28,7 @@ void ServerStuff::readClient()
     QTcpSocket *clientSocket = (QTcpSocket*)sender();
 
     QDataStream in(clientSocket);
-    //in.setVersion(QDataStream::Qt_5_10);
+    //in.setVersion(QDataStream::Qt_5_10); //no idea what this does
     for (;;)
     {
         if (!m_nNextBlockSize) {
@@ -42,13 +42,17 @@ void ServerStuff::readClient()
 
         emit gotNewMesssage(str);
 
+        foreach(QTcpSocket *clientSocketA, clients){sendToClient(clientSocketA, str);}
+
         m_nNextBlockSize = 0;
 
-        if (sendToClient(clientSocket, QString("Reply: received [%1]").arg(str)) == -1)
+        if (sendToClient(clientSocket, QString().arg(str)) == -1)
         {
             qDebug() << "Some error occured";
         }
+
     }
+
 }
 
 void ServerStuff::gotDisconnection()

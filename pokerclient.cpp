@@ -1,5 +1,6 @@
 #include "pokerclient.h"
 #include "ui_pokerclient.h"
+#include "mainwindow.h"
 
 pokerclient::pokerclient(QWidget *parent) :
     QDialog(parent),
@@ -96,4 +97,12 @@ void pokerclient::on_pushButton_send_clicked()
 void pokerclient::on_pushButton_disconnect_clicked()
 {
     client->closeConnection();
+}
+
+void pokerclient::on_pushButton_Exit_clicked()
+{
+    on_pushButton_disconnect_clicked();
+    MainWindow * mainWindow = new MainWindow;
+    mainWindow->show();
+    close();
 }
