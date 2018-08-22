@@ -1,6 +1,7 @@
 #include "pokerserver.h"
 #include "ui_pokerserver.h"
 #include "mainwindow.h"
+#include "info.h"
 
 pokerserver::pokerserver(QWidget *parent) :
     QDialog(parent),
@@ -28,7 +29,7 @@ pokerserver::~pokerserver()
 
 void pokerserver::on_pushButton_startServer_clicked()
 {
-    if (!server->tcpServer->listen(QHostAddress::Any/*"samuelmueller.ddns.net"*/, 6545))
+    if (!server->tcpServer->listen(QHostAddress::Any, portInfo))
     {
         ui->textEdit_log->append(tr("<font color=\"red\"><b>Error!</b> The port is taken by some other service.</font>"));
         return;
