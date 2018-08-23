@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QDebug>
+#include <QObject>
 #include "serverStuff.h"
 
 namespace Ui {
@@ -26,6 +27,8 @@ private slots:
     void gotNewMesssage(QString msg);
 
     void on_pushButton_Exit_clicked();
+
+    void on_pushButton_send_2_clicked();
 
 private:
     Ui::pokerserver *ui;

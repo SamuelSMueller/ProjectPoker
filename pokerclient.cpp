@@ -98,6 +98,7 @@ void pokerclient::on_pushButton_send_clicked()
 void pokerclient::on_pushButton_disconnect_clicked()
 {
     client->closeConnection();
+    ui->textEdit_log->append("---Exited Room---");
 }
 
 void pokerclient::on_pushButton_Exit_clicked()

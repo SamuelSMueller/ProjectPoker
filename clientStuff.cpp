@@ -65,7 +65,7 @@ void ClientStuff::readyRead()
 
         if (str == "0")
         {
-            str = "Connection closed";
+            str = "Room closed";
             closeConnection();
         }
 

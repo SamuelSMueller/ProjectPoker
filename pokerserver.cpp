@@ -92,8 +92,9 @@ void pokerserver::smbDisconnectedFromServer()
 
 void pokerserver::gotNewMesssage(QString msg)
 {
-    ui->textEdit_log->append(QString("New message: %1").arg(msg));
+    ui->textEdit_log->append(QString("%1").arg(msg));
 }
+
 
 void pokerserver::on_pushButton_Exit_clicked()
 {
@@ -102,3 +103,16 @@ void pokerserver::on_pushButton_Exit_clicked()
     mainWindow->show();
     close();
 }
+
+void pokerserver::on_pushButton_send_2_clicked()
+{
+    QList<QTcpSocket *> clients = server->getClients();
+    QString msg = ui->lineEdit_message_2->text();
+
+    for(int i = 0; i < clients.count(); i++)
+    {
+        server->sendToClient(clients.at(i), msg);
+    }
+    ui->textEdit_log->append(msg);
+}
+

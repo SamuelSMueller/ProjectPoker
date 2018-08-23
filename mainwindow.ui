@@ -194,7 +194,7 @@
          </palette>
         </property>
         <property name="text">
-         <string>UserName</string>
+         <string>Username</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

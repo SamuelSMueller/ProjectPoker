@@ -46,7 +46,7 @@ void ServerStuff::readClient()
 
         m_nNextBlockSize = 0;
 
-        if (sendToClient(clientSocket, QString().arg(str)) == -1)
+        if (QString().arg(str) == -1)
         {
             qDebug() << "Some error occured";
         }
