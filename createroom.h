@@ -15,13 +15,15 @@ class createroom : public QDialog
 public:
     explicit createroom(QWidget *parent = nullptr);
     ~createroom();
+    void setUsername(QString uName);
 
 private slots:
-    void on_pushButton_clicked();
 
+    void on_pushButton_clicked();
     void on_pushButton_2_clicked();
 
 private:
+    QString username;
     Ui::createroom *ui;
 };
 

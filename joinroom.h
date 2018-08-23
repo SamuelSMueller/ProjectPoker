@@ -15,14 +15,15 @@ class joinroom : public QDialog
 public:
     explicit joinroom(QWidget *parent = nullptr);
     ~joinroom();
+    void setUsername(QString uName);
 
 private slots:
 
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
 
 private:
+    QString username;
     Ui::joinroom *ui;
 };
 

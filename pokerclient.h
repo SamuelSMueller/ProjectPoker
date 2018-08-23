@@ -16,6 +16,8 @@ class pokerclient : public QDialog
 public:
     explicit pokerclient(QWidget *parent = nullptr);
     ~pokerclient();
+    void setUsername(QString username);
+    void setRoomname(QString roomname);
 
 public slots:
     void setStatus(bool newStatus);
@@ -30,6 +32,8 @@ private slots:
     void on_pushButton_Exit_clicked();
 
 private:
+    QString username;
+    QString roomname;
     Ui::pokerclient *ui;
     ClientStuff *client;
 };

@@ -17,6 +17,8 @@ class pokerserver : public QDialog
 public:
     explicit pokerserver(QWidget *parent = nullptr);
     ~pokerserver();
+    void setUsername(QString username);
+    void setRoomname(QString roomname);
 
 private slots:
     void on_pushButton_stopServer_clicked();
@@ -31,6 +33,8 @@ private slots:
     void on_pushButton_send_2_clicked();
 
 private:
+    QString username;
+    QString roomname;
     Ui::pokerserver *ui;
     ServerStuff *server;
 };

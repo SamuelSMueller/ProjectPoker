@@ -35,7 +35,11 @@ void pokerserver::on_pushButton_startServer_clicked()
         return;
     }
     connect(server->tcpServer, &QTcpServer::newConnection, server, &ServerStuff::newConnection);
-    ui->textEdit_log->append(tr("<font color=\"green\"><b>Room is opened.</b></font>"));
+    ui->textEdit_log->append(QString("<font color=\"green\"><b> %1 %2 </b></font>")
+                .arg(roomname)
+                .arg(tr(" is opened."))
+                );
+
 }
 
 void pokerserver::on_pushButton_stopServer_clicked()
@@ -52,7 +56,11 @@ void pokerserver::on_pushButton_stopServer_clicked()
         }
 
         server->tcpServer->close();
-        ui->textEdit_log->append(tr("<b>Room is closed.</b>"));
+        ui->textEdit_log->append(QString("<font color=\"green\"><b> %1 %2 </b></font>")
+                                 .arg(roomname)
+                                 .arg(tr(" is closed."))
+                                 );
+
     }
     else
     {
@@ -107,7 +115,8 @@ void pokerserver::on_pushButton_Exit_clicked()
 void pokerserver::on_pushButton_send_2_clicked()
 {
     QList<QTcpSocket *> clients = server->getClients();
-    QString msg = ui->lineEdit_message_2->text();
+    QString msg = username + ": " + (ui->lineEdit_message_2->text());
+
 
     for(int i = 0; i < clients.count(); i++)
     {
@@ -116,3 +125,12 @@ void pokerserver::on_pushButton_send_2_clicked()
     ui->textEdit_log->append(msg);
 }
 
+void pokerserver::setUsername(QString uName)
+{
+    username = uName;
+}
+
+void pokerserver::setRoomname(QString rName)
+{
+    roomname = rName;
+}

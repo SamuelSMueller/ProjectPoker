@@ -17,10 +17,12 @@ joinroom::~joinroom()
 
 void joinroom::on_pushButton_clicked()
 {
-    //QString roomname = ui->lineEdit_2->text();
+    QString roomname = ui->lineEdit_2->text();
     //qDebug() << roomname;
     close();
     pokerclient * pkCl = new pokerclient;
+    pkCl->setUsername(username);
+    pkCl->setRoomname(roomname);
     pkCl->show();
 }
 
@@ -31,3 +33,10 @@ void joinroom::on_pushButton_2_clicked()
         close();
 
 }
+
+
+void joinroom::setUsername(QString uName)
+{
+    username = uName;
+}
+

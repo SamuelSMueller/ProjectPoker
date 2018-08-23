@@ -87,18 +87,19 @@ void pokerclient::on_pushButton_send_clicked()
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
     //out.setVersion(QDataStream::Qt_5_10);
-    out << quint16(0) << ui->lineEdit_message->text();
+    out << quint16(0) << (username + ": " + ui->lineEdit_message->text());
 
     out.device()->seek(0);
     out << quint16(arrBlock.size() - sizeof(quint16));
 
     client->tcpSocket->write(arrBlock);
+    qDebug()<<arrBlock;
 }
 
 void pokerclient::on_pushButton_disconnect_clicked()
 {
     client->closeConnection();
-    ui->textEdit_log->append("---Exited Room---");
+    ui->textEdit_log->append("Exited Room.");
 }
 
 void pokerclient::on_pushButton_Exit_clicked()
@@ -107,4 +108,16 @@ void pokerclient::on_pushButton_Exit_clicked()
     MainWindow * mainWindow = new MainWindow;
     mainWindow->show();
     close();
+}
+
+
+
+void pokerclient::setUsername(QString uName)
+{
+    username = uName;
+}
+
+void pokerclient::setRoomname(QString rName)
+{
+    roomname = rName;
 }

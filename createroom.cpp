@@ -21,6 +21,9 @@ void createroom::on_pushButton_clicked()
     qDebug() << roomname;
     close();
     pokerserver * pkRm = new pokerserver;
+    pkRm->setUsername(username);
+    pkRm->setRoomname(roomname);
+    pkRm->setWindowTitle(roomname);
     pkRm->show();
 }
 
@@ -30,3 +33,9 @@ void createroom::on_pushButton_2_clicked()
     mainWindow->show();
     close();
 }
+
+void createroom::setUsername(QString uName)
+{
+    username = uName;
+}
+
