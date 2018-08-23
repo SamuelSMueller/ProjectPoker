@@ -4,9 +4,11 @@
 ClientStuff::ClientStuff(
         const QString hostAddress,
         int portNumber,
-        QObject *parent
+        QObject *parent,
+        QString uName
         ) : QObject(parent), m_nNextBlockSize(0)
 {
+    username = uName;
     status = false;
 
     host = hostAddress;
@@ -24,7 +26,7 @@ void ClientStuff::connect2host()
 {
     timeoutTimer->start(3000);
 
-    tcpSocket->connectToHost(netInfo, portInfo);
+    tcpSocket->connectToHost(host, port);
     connect(tcpSocket, &QTcpSocket::connected, this, &ClientStuff::connected);
     connect(tcpSocket, &QTcpSocket::readyRead, this, &ClientStuff::readyRead);
 }

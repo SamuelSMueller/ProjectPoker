@@ -18,10 +18,9 @@ joinroom::~joinroom()
 void joinroom::on_pushButton_clicked()
 {
     QString roomname = ui->lineEdit_2->text();
-    //qDebug() << roomname;
+//    qDebug() << roomname;
     close();
-    pokerclient * pkCl = new pokerclient;
-    pkCl->setUsername(username);
+    pokerclient * pkCl = new pokerclient(nullptr, username);
     pkCl->setRoomname(roomname);
     pkCl->show();
 }

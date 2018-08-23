@@ -15,7 +15,7 @@ class pokerserver : public QDialog
     Q_OBJECT
 
 public:
-    explicit pokerserver(QWidget *parent = nullptr);
+    explicit pokerserver(QWidget *parent = nullptr, QString rName = "roomname");
     ~pokerserver();
     void setUsername(QString username);
     void setRoomname(QString roomname);

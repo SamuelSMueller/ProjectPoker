@@ -3,14 +3,13 @@
 #include "mainwindow.h"
 #include "info.h"
 
-pokerserver::pokerserver(QWidget *parent) :
+pokerserver::pokerserver(QWidget *parent,  QString rName) :
     QDialog(parent),
     ui(new Ui::pokerserver)
 {
     ui->setupUi(this);
-
-
-    server = new ServerStuff(this);
+    roomname = rName;
+    server = new ServerStuff(this, roomname);
     connect(server, &ServerStuff::gotNewMesssage,
             this, &pokerserver::gotNewMesssage);
     connect(server->tcpServer, &QTcpServer::newConnection,
@@ -39,7 +38,7 @@ void pokerserver::on_pushButton_startServer_clicked()
                 .arg(roomname)
                 .arg(tr(" is opened."))
                 );
-
+    ui->listWidget->addItem("Admin: " + username);
 }
 
 void pokerserver::on_pushButton_stopServer_clicked()
@@ -90,17 +89,23 @@ void pokerserver::on_pushButton_testConn_clicked()
 
 void pokerserver::smbConnectedToServer()
 {
-    ui->textEdit_log->append(tr("A new player has joined."));
+  ui->textEdit_log->append("A new player has joined.");
 }
 
 void pokerserver::smbDisconnectedFromServer()
 {
-    ui->textEdit_log->append(tr("A player has left."));
+    ui->textEdit_log->append("A player has left.");
+ /*   QList<QListWidgetItem*> names = ui->listWidget->findItems(username , Qt::MatchExactly);
+    if(names.size() > 0)
+    {
+        ui->listWidget->removeItemWidget(names.first());
+    }
+    */
 }
 
 void pokerserver::gotNewMesssage(QString msg)
 {
-    ui->textEdit_log->append(QString("%1").arg(msg));
+        ui->textEdit_log->append(QString("%1").arg(msg));
 }
 
 
@@ -128,9 +133,4 @@ void pokerserver::on_pushButton_send_2_clicked()
 void pokerserver::setUsername(QString uName)
 {
     username = uName;
-}
-
-void pokerserver::setRoomname(QString rName)
-{
-    roomname = rName;
 }

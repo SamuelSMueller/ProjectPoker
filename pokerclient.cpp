@@ -3,15 +3,17 @@
 #include "mainwindow.h"
 #include "info.h"
 
-pokerclient::pokerclient(QWidget *parent) :
+
+pokerclient::pokerclient(QWidget *parent, QString uName) :
     QDialog(parent),
     ui(new Ui::pokerclient)
 {
+    username = uName;
     ui->setupUi(this);
 
     ui->pushButton_disconnect->setVisible(false);
 
-    client = new ClientStuff(netInfo, portInfo);
+    client = new ClientStuff(netInfo, portInfo, nullptr, username);
 
     setStatus(client->getStatus());
 
@@ -80,6 +82,17 @@ void pokerclient::gotError(QAbstractSocket::SocketError err)
 void pokerclient::on_pushButton_connect_clicked()
 {
     client->connect2host();
+    //------------------------------------------------EVERYTHING BELOW
+    QByteArray arrBlock;
+    QDataStream out(&arrBlock, QIODevice::WriteOnly);
+    //out.setVersion(QDataStream::Qt_5_10);
+    out << quint16(0) << (username);
+
+    out.device()->seek(0);
+    out << quint16(arrBlock.size() - sizeof(quint16));
+
+    client->tcpSocket->write(arrBlock);
+    //------------------------------------------------EVERYTHING ABOVE
 }
 
 void pokerclient::on_pushButton_send_clicked()
@@ -93,7 +106,6 @@ void pokerclient::on_pushButton_send_clicked()
     out << quint16(arrBlock.size() - sizeof(quint16));
 
     client->tcpSocket->write(arrBlock);
-    qDebug()<<arrBlock;
 }
 
 void pokerclient::on_pushButton_disconnect_clicked()
@@ -110,12 +122,6 @@ void pokerclient::on_pushButton_Exit_clicked()
     close();
 }
 
-
-
-void pokerclient::setUsername(QString uName)
-{
-    username = uName;
-}
 
 void pokerclient::setRoomname(QString rName)
 {

@@ -11,7 +11,7 @@ class ClientStuff : public QObject
     Q_OBJECT
 
 public:
-    ClientStuff(const QString hostAddress, int portVal, QObject *parent = nullptr);
+    ClientStuff(const QString hostAddress, int portVal, QObject *parent = nullptr, QString username = "username");
 
     QTcpSocket *tcpSocket;
     bool getStatus();
@@ -35,6 +35,7 @@ private:
     bool status;
     quint16 m_nNextBlockSize;
     QTimer *timeoutTimer;
+    QString username;
 };
 
 #endif // CLIENTSTUFF_H

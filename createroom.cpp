@@ -18,11 +18,10 @@ createroom::~createroom()
 void createroom::on_pushButton_clicked()
 {
     QString roomname = ui->lineEdit_2->text();
-    qDebug() << roomname;
+//    qDebug() << roomname;
     close();
-    pokerserver * pkRm = new pokerserver;
+    pokerserver * pkRm = new pokerserver(nullptr, roomname);
     pkRm->setUsername(username);
-    pkRm->setRoomname(roomname);
     pkRm->setWindowTitle(roomname);
     pkRm->show();
 }

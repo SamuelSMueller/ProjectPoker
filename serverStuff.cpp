@@ -1,8 +1,9 @@
 #include "serverStuff.h"
 
-ServerStuff::ServerStuff(QObject *pwgt) : QObject(pwgt), m_nNextBlockSize(0)
+ServerStuff::ServerStuff(QObject *pwgt, QString rName) : QObject(pwgt), m_nNextBlockSize(0)
 {
     tcpServer = new QTcpServer(this);
+    roomname = rName;
 }
 
 QList<QTcpSocket *> ServerStuff::getClients()
@@ -13,22 +14,20 @@ QList<QTcpSocket *> ServerStuff::getClients()
 void ServerStuff::newConnection()
 {
     QTcpSocket *clientSocket = tcpServer->nextPendingConnection();
-
     connect(clientSocket, &QTcpSocket::disconnected, clientSocket, &QTcpSocket::deleteLater);
     connect(clientSocket, &QTcpSocket::readyRead, this, &ServerStuff::readClient);
     connect(clientSocket, &QTcpSocket::disconnected, this, &ServerStuff::gotDisconnection);
 
     clients << clientSocket;
-
-    sendToClient(clientSocket, "---Joined Room---");
+//    sendToClient(clientSocket, QString("Joined Room: " + roomname));
 }
 
 void ServerStuff::readClient()
 {
-    QTcpSocket *clientSocket = (QTcpSocket*)sender();
+    QTcpSocket *clientSocket = (QTcpSocket*)sender(); //c-style cast, should be qobject_cast<QTcpSocket*>(sender());
 
     QDataStream in(clientSocket);
-    //in.setVersion(QDataStream::Qt_5_10); //no idea what this does
+    //in.setVersion(QDataStream::Qt_5_10);
     for (;;)
     {
         if (!m_nNextBlockSize) {
@@ -42,7 +41,10 @@ void ServerStuff::readClient()
 
         emit gotNewMesssage(str);
 
-        foreach(QTcpSocket *clientSocketA, clients){sendToClient(clientSocketA, str);}
+        foreach(QTcpSocket *clientSocketA, clients)
+        {
+            sendToClient(clientSocketA, str);
+        }
 
         m_nNextBlockSize = 0;
 

@@ -14,9 +14,8 @@ class pokerclient : public QDialog
     Q_OBJECT
 
 public:
-    explicit pokerclient(QWidget *parent = nullptr);
+    explicit pokerclient(QWidget *parent = nullptr, QString uName = "username");
     ~pokerclient();
-    void setUsername(QString username);
     void setRoomname(QString roomname);
 
 public slots:
