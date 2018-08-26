@@ -70,6 +70,18 @@ void pokerclient::receivedSomething(QString msg)
             ui->listWidget->addItem(currentUsers.at(i));
         }
     }
+    else if(msg == "/ERRNAME/")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("This user name is taken.");
+        msgBox.setInformativeText("Please rejoin with a new username.");
+        msgBox.exec();
+        client->closeConnection();
+
+        MainWindow * mainWindow = new MainWindow;
+        mainWindow->show();
+        close();
+    }
     else
     {
         ui->textEdit_log->append(msg);
@@ -87,7 +99,7 @@ void pokerclient::gotError(QAbstractSocket::SocketError err)
             strError = "Could not join Room";
             break;
         case 1:
-            strError = "Room Admin closed the Room";
+            strError = "Admin closed the Room";
             break;
         case 2:
             strError = "Unable to find Room";

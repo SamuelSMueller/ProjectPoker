@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QDebug>
 #include <QObject>
+#include <QRandomGenerator>
+#include <QTime>
 #include "serverStuff.h"
 
 namespace Ui {
@@ -26,11 +28,13 @@ private slots:
     void on_pushButton_testConn_clicked();
     void smbConnectedToServer();
     void smbDisconnectedFromServer();
-    void gotNewMesssage(QString msg);
+    void gotNewMesssage(QString msg, QTcpSocket *clientSocket);
 
     void on_pushButton_Exit_clicked();
 
     void on_pushButton_send_2_clicked();
+
+    void on_pushButton_Shuffle_clicked();
 
 private:
     QString username;

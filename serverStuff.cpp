@@ -38,7 +38,7 @@ void ServerStuff::readClient()
         QString str;
         in >> str;
 
-        emit gotNewMesssage(str);
+        emit gotNewMesssage(str, clientSocket);
 
         if(!str.startsWith("/USER/") && !str.startsWith("/DCON/"))
         {

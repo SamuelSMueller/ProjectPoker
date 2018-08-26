@@ -100,19 +100,28 @@ void pokerserver::smbDisconnectedFromServer()
     ui->textEdit_log->append("A player has left.");
 }
 
-void pokerserver::gotNewMesssage(QString msg)
+void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
 {
     if(msg.startsWith("/USER/"))
     {
+        qDebug()<<"CHECK 1";
         msg.remove(0,6);
         if(currentUsers.isEmpty())
         {
             currentUsers.append("Admin: "+username);
         }
+
         int j = currentUsers.indexOf(("Player: "+msg));
+        QList<QTcpSocket *> clients = server->getClients();
+        qDebug()<<"CHECK 2";
         if(j == -1)
         {
-            currentUsers.append("Player: "+msg);
+           currentUsers.append("Player: "+msg);
+        }
+
+        else if(j != -1)
+        {
+            server->sendToClient(clientSocket, "/ERRNAME/");
         }
 
         ui->listWidget->clear();
@@ -122,7 +131,6 @@ void pokerserver::gotNewMesssage(QString msg)
             ui->listWidget->addItem(currentUsers.at(i));
         }
 
-        QList<QTcpSocket *> clients = server->getClients();
         for(int i = 0; i < clients.count(); i++)
         {
             server->sendToClient(clients.at(i), "/CLEARLIST/");
@@ -189,4 +197,42 @@ void pokerserver::on_pushButton_send_2_clicked()
 void pokerserver::setUsername(QString uName)
 {
     username = uName;
+}
+
+void pokerserver::on_pushButton_Shuffle_clicked()
+{   QTime time = QTime::currentTime();
+
+    QRandomGenerator rand((uint)time.msec());
+    int gen;
+    int first = 1;
+    int last = currentUsers.count();
+    for(int i = 1; i<currentUsers.count(); i++)
+    {
+        qDebug()<<"Current Index: ";
+        qDebug()<<i;
+
+        gen = rand.bounded(first, last);
+
+        qDebug()<<"Random Num: ";
+        qDebug()<<gen;
+        currentUsers.swap(i, gen);
+    }
+
+    ui->listWidget->clear();
+
+    for(int i = 0; i<currentUsers.count(); i++)
+    {
+        ui->listWidget->addItem(currentUsers.at(i));
+    }
+
+    QList<QTcpSocket *> clients = server->getClients();
+    for(int i = 0; i < clients.count(); i++)
+    {
+        server->sendToClient(clients.at(i), "/CLEARLIST/");
+        for(int j = 0; j < currentUsers.count(); j++)
+        {
+            server->sendToClient(clients.at(i), ("/ADDLIST/"+currentUsers.at(j)));
+        }
+        server->sendToClient(clients.at(i), "/ENDLIST/");
+    }
 }

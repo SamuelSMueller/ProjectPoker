@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    //TO DO - SET UP COLOR SCHEMES
+    //this->setStyleSheet("background:rgb(245,250,250);");
     ui->setupUi(this);
 }
 

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QAbstractSocket>
+#include <QMessageBox>
 #include "clientStuff.h"
 
 namespace Ui {
