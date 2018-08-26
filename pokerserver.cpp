@@ -60,6 +60,9 @@ void pokerserver::on_pushButton_stopServer_clicked()
                                  .arg(tr(" is closed."))
                                  );
 
+        currentUsers.clear();
+        ui->listWidget->clear();
+
     }
     else
     {
@@ -74,7 +77,7 @@ void pokerserver::on_pushButton_testConn_clicked()
         ui->textEdit_log->append(
                     QString("%1 %2")
                     .arg("Room is opened, number of current players:")
-                    .arg(QString::number(server->getClients().count()))
+                    .arg(QString::number(server->getClients().count()+1))
                     );
     }
     else
@@ -95,19 +98,72 @@ void pokerserver::smbConnectedToServer()
 void pokerserver::smbDisconnectedFromServer()
 {
     ui->textEdit_log->append("A player has left.");
- /*   QList<QListWidgetItem*> names = ui->listWidget->findItems(username , Qt::MatchExactly);
-    if(names.size() > 0)
-    {
-        ui->listWidget->removeItemWidget(names.first());
-    }
-    */
 }
 
 void pokerserver::gotNewMesssage(QString msg)
 {
-        ui->textEdit_log->append(QString("%1").arg(msg));
-}
+    if(msg.startsWith("/USER/"))
+    {
+        msg.remove(0,6);
+        if(currentUsers.isEmpty())
+        {
+            currentUsers.append("Admin: "+username);
+        }
+        int j = currentUsers.indexOf(("Player: "+msg));
+        if(j == -1)
+        {
+            currentUsers.append("Player: "+msg);
+        }
 
+        ui->listWidget->clear();
+
+        for(int i = 0; i<currentUsers.count(); i++)
+        {
+            ui->listWidget->addItem(currentUsers.at(i));
+        }
+
+        QList<QTcpSocket *> clients = server->getClients();
+        for(int i = 0; i < clients.count(); i++)
+        {
+            server->sendToClient(clients.at(i), "/CLEARLIST/");
+            for(int j = 0; j < currentUsers.count(); j++)
+            {
+                server->sendToClient(clients.at(i), ("/ADDLIST/"+currentUsers.at(j)));
+            }
+            server->sendToClient(clients.at(i), "/ENDLIST/");
+        }
+    }
+    else if(msg.startsWith("/DCON/"))
+    {
+        msg.remove(0,6);
+        QList<QListWidgetItem*> names = ui->listWidget->findItems(("Player: "+msg) , Qt::MatchExactly);
+        if(names.count() > 0)
+        {
+            delete ui->listWidget->takeItem(ui->listWidget->row(names.first()));
+            int j = currentUsers.indexOf(("Player: "+msg));
+            if(j != -1)
+            {
+                currentUsers.removeAt(j);
+            }
+        names.clear();
+        }
+
+        QList<QTcpSocket *> clients = server->getClients();
+        for(int i = 0; i < clients.count(); i++)
+        {
+            server->sendToClient(clients.at(i), "/CLEARLIST/");
+            for(int j = 0; j < currentUsers.count(); j++)
+            {
+                server->sendToClient(clients.at(i), ("/ADDLIST/"+currentUsers.at(j)));
+            }
+            server->sendToClient(clients.at(i), "/ENDLIST/");
+        }
+    }
+    else
+    {
+        ui->textEdit_log->append(QString("%1").arg(msg));
+    }
+}
 
 void pokerserver::on_pushButton_Exit_clicked()
 {

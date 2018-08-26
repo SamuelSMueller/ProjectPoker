@@ -13,13 +13,13 @@ QList<QTcpSocket *> ServerStuff::getClients()
 
 void ServerStuff::newConnection()
 {
+
     QTcpSocket *clientSocket = tcpServer->nextPendingConnection();
     connect(clientSocket, &QTcpSocket::disconnected, clientSocket, &QTcpSocket::deleteLater);
     connect(clientSocket, &QTcpSocket::readyRead, this, &ServerStuff::readClient);
     connect(clientSocket, &QTcpSocket::disconnected, this, &ServerStuff::gotDisconnection);
 
     clients << clientSocket;
-//    sendToClient(clientSocket, QString("Joined Room: " + roomname));
 }
 
 void ServerStuff::readClient()
@@ -27,7 +27,6 @@ void ServerStuff::readClient()
     QTcpSocket *clientSocket = (QTcpSocket*)sender(); //c-style cast, should be qobject_cast<QTcpSocket*>(sender());
 
     QDataStream in(clientSocket);
-    //in.setVersion(QDataStream::Qt_5_10);
     for (;;)
     {
         if (!m_nNextBlockSize) {
@@ -41,11 +40,13 @@ void ServerStuff::readClient()
 
         emit gotNewMesssage(str);
 
-        foreach(QTcpSocket *clientSocketA, clients)
+        if(!str.startsWith("/USER/") && !str.startsWith("/DCON/"))
         {
-            sendToClient(clientSocketA, str);
+            foreach(QTcpSocket *clientSocketA, clients)
+            {
+                sendToClient(clientSocketA, str);
+            }
         }
-
         m_nNextBlockSize = 0;
 
         if (QString().arg(str) == -1)
@@ -67,8 +68,6 @@ qint64 ServerStuff::sendToClient(QTcpSocket* socket, const QString& str)
 {
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
-    //out.setVersion(QDataStream::Qt_5_10);
-    //out << quint16(0) << QTime::currentTime() << str;
     out << quint16(0) << str;
 
     out.device()->seek(0);

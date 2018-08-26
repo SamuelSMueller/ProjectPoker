@@ -27,12 +27,12 @@ private slots:
     void on_pushButton_send_clicked();
     void on_pushButton_connect_clicked();
     void on_pushButton_disconnect_clicked();
-
     void on_pushButton_Exit_clicked();
 
 private:
     QString username;
     QString roomname;
+    QList<QString> currentUsers;
     Ui::pokerclient *ui;
     ClientStuff *client;
 };

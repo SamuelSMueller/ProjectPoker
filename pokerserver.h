@@ -35,6 +35,7 @@ private slots:
 private:
     QString username;
     QString roomname;
+    QList<QString> currentUsers;
     Ui::pokerserver *ui;
     ServerStuff *server;
 };

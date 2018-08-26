@@ -51,12 +51,35 @@ void pokerclient::setStatus(bool newStatus)
 
 void pokerclient::receivedSomething(QString msg)
 {
-    ui->textEdit_log->append(msg);
+    if(msg == "/CLEARLIST/")
+    {
+        currentUsers.clear();
+    }
+
+    else if(msg.startsWith("/ADDLIST/"))
+    {
+        msg.remove(0,9);
+        currentUsers.append(msg);
+    }
+
+    else if(msg == "/ENDLIST/")
+    {
+        ui->listWidget->clear();
+        for(int i = 0; i<currentUsers.count(); i++)
+        {
+            ui->listWidget->addItem(currentUsers.at(i));
+        }
+    }
+    else
+    {
+        ui->textEdit_log->append(msg);
+    }
+
 }
 
 void pokerclient::gotError(QAbstractSocket::SocketError err)
 {
-    //qDebug() << "got error";
+
     QString strError = "unknown";
     switch (err)
     {
@@ -86,7 +109,7 @@ void pokerclient::on_pushButton_connect_clicked()
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
     //out.setVersion(QDataStream::Qt_5_10);
-    out << quint16(0) << (username);
+    out << quint16(0) << ("/USER/"+username);
 
     out.device()->seek(0);
     out << quint16(arrBlock.size() - sizeof(quint16));
@@ -110,8 +133,23 @@ void pokerclient::on_pushButton_send_clicked()
 
 void pokerclient::on_pushButton_disconnect_clicked()
 {
-    client->closeConnection();
+    //----------------------------------------------EVERYTHING BELOW
+    QByteArray arrBlock;
+    QDataStream out(&arrBlock, QIODevice::WriteOnly);
+    //out.setVersion(QDataStream::Qt_5_10);
+    out << quint16(0) << ("/DCON/"+username);
+
+    out.device()->seek(0);
+    out << quint16(arrBlock.size() - sizeof(quint16));
+
+    client->tcpSocket->write(arrBlock);
+    //-----------------------------------------------EVERYTHING ABOVE
+    client->tcpSocket->waitForBytesWritten();
+
+    ui->listWidget->clear();
+
     ui->textEdit_log->append("Exited Room.");
+    client->closeConnection();
 }
 
 void pokerclient::on_pushButton_Exit_clicked()
