@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>650</height>
+    <width>616</width>
+    <height>778</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -277,6 +277,13 @@
     </layout>
    </item>
    <item row="3" column="0">
+    <layout class="QHBoxLayout" name="chartLayoutS">
+     <item>
+      <widget class="QWidget" name="widget5" native="true"/>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QListWidget" name="listWidget">
@@ -300,7 +307,7 @@
      </item>
     </layout>
    </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <layout class="QFormLayout" name="formLayout_2">
      <item row="0" column="0">
       <widget class="QPushButton" name="pushButton_send_2">
@@ -376,7 +383,7 @@
      </item>
     </layout>
    </item>
-   <item row="5" column="0">
+   <item row="6" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="pushButton_testConn">

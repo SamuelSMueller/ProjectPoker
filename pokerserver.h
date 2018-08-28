@@ -6,6 +6,9 @@
 #include <QObject>
 #include <QRandomGenerator>
 #include <QTime>
+#include <QtCharts>
+
+
 #include "serverStuff.h"
 
 namespace Ui {
@@ -29,12 +32,11 @@ private slots:
     void smbConnectedToServer();
     void smbDisconnectedFromServer();
     void gotNewMesssage(QString msg, QTcpSocket *clientSocket);
-
     void on_pushButton_Exit_clicked();
-
     void on_pushButton_send_2_clicked();
-
     void on_pushButton_Shuffle_clicked();
+    void makechart(QList<QBarSeries *> series);
+
 
 private:
     QString username;
@@ -42,6 +44,7 @@ private:
     QList<QString> currentUsers;
     Ui::pokerserver *ui;
     ServerStuff *server;
+    QList<QString> userVotes;
 };
 
 #endif // POKERSERVER_H

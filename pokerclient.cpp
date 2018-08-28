@@ -2,6 +2,7 @@
 #include "ui_pokerclient.h"
 #include "mainwindow.h"
 #include "info.h"
+using namespace QtCharts;
 
 
 pokerclient::pokerclient(QWidget *parent, QString uName) :
@@ -10,6 +11,45 @@ pokerclient::pokerclient(QWidget *parent, QString uName) :
 {
     username = uName;
     ui->setupUi(this);
+
+
+    QBarSet *set0 = new QBarSet("1");
+    QBarSet *set1 = new QBarSet("2");
+    QBarSet *set2 = new QBarSet("3");
+    QBarSet *set3 = new QBarSet("4");
+    QBarSet *set4 = new QBarSet("5");
+
+    *set0 << 1 << 1 << 2;
+    *set1 << 3 << 1 << 2;
+    *set2 << 4 << 0 << 2;
+    *set3 << 1 << 3 << 2;
+    *set4 << 2 << 2 << 2;
+
+    QBarSeries *series = new QBarSeries();
+    series->append(set0);
+    series->append(set1);
+    series->append(set2);
+    series->append(set3);
+    series->append(set4);
+
+
+    QChart* chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Votes");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    QStringList categories;
+    categories << "First" << "Second" << "Third" << "Fourth" << "Fifth";
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(categories);
+    chart->createDefaultAxes();
+    chart->setAxisX(axis, series);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignCenter);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    ui->horizontalLayout_5->addWidget(chartView);
+
 
     ui->pushButton_disconnect->setVisible(false);
 
@@ -176,4 +216,51 @@ void pokerclient::on_pushButton_Exit_clicked()
 void pokerclient::setRoomname(QString rName)
 {
     roomname = rName;
+}
+
+
+void pokerclient::on_pushButton_Vote8_clicked()
+{
+    voteNum = "8";
+}
+void pokerclient::on_pushButton_Vote7_clicked()
+{
+    voteNum = "5";
+}
+void pokerclient::on_pushButton_Vote6_clicked()
+{
+    voteNum = "3";
+}
+void pokerclient::on_pushButton_Vote5_clicked()
+{
+    voteNum = "2";
+}
+void pokerclient::on_pushButton_Vote4_clicked()
+{
+    voteNum = "1";
+}
+void pokerclient::on_pushButton_Vote3_clicked()
+{
+    voteNum = "1/2";
+}
+void pokerclient::on_pushButton_Vote2_clicked()
+{
+    voteNum = "0";
+}
+void pokerclient::on_pushButton_Vote1_clicked()
+{
+    voteNum = "?";
+}
+
+void pokerclient::on_pushButton_Vote_clicked()
+{
+    QByteArray arrBlock;
+    QDataStream out(&arrBlock, QIODevice::WriteOnly);
+    //out.setVersion(QDataStream::Qt_5_10);
+    out << quint16(0) << ("/VOTEN/" + voteNum);
+
+    out.device()->seek(0);
+    out << quint16(arrBlock.size() - sizeof(quint16));
+
+    client->tcpSocket->write(arrBlock);
 }

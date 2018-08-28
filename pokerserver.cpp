@@ -8,14 +8,20 @@ pokerserver::pokerserver(QWidget *parent,  QString rName) :
     ui(new Ui::pokerserver)
 {
     ui->setupUi(this);
+    QList<QBarSeries *> series;
+    makechart(series);
     roomname = rName;
     server = new ServerStuff(this, roomname);
+
     connect(server, &ServerStuff::gotNewMesssage,
             this, &pokerserver::gotNewMesssage);
     connect(server->tcpServer, &QTcpServer::newConnection,
             this, &pokerserver::smbConnectedToServer);
     connect(server, &ServerStuff::smbDisconnected,
             this, &pokerserver::smbDisconnectedFromServer);
+
+
+
 }
 
 pokerserver::~pokerserver()
@@ -167,6 +173,112 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
             server->sendToClient(clients.at(i), "/ENDLIST/");
         }
     }
+    else if(msg.startsWith("/VOTEN/"))
+    {
+        msg.remove(0,7);
+        userVotes.append(msg);
+        qDebug()<<userVotes[0];
+        qDebug()<<msg;
+        if(userVotes.count() == (currentUsers.count()-1))
+        {
+            //------WRITTEN TERRIBLY, LATE AT NIGHT, AFTER HOMEWORK. WILL BE REWRITTEN LATER--------//
+            int first = 0;
+            int second = 0;
+            int third = 0;
+            int fourth = 0;
+            int fifth = 0;
+            int sixth = 0;
+            int seventh = 0;
+            int eigth = 0;
+
+            QBarSet *set0 = new QBarSet("?");
+            QBarSet *set1 = new QBarSet("0");
+            QBarSet *set2 = new QBarSet("1/2");
+            QBarSet *set3 = new QBarSet("1");
+            QBarSet *set4 = new QBarSet("2");
+            QBarSet *set5 = new QBarSet("3");
+            QBarSet *set6 = new QBarSet("5");
+            QBarSet *set7 = new QBarSet("8");
+
+            for(int i = 0; i<userVotes.count(); i++)
+            {
+                if(userVotes.at(i) == "?")
+                {
+                    first++;
+                }
+                else if(userVotes.at(i) == "0")
+                {
+                    second++;
+                }
+                else if(userVotes.at(i) == "1/2")
+                {
+                    third++;
+                }
+                else if(userVotes.at(i) == "1")
+                {
+                    fourth++;
+                }
+                else if(userVotes.at(i) == "2")
+                {
+                    fifth++;
+                }
+                else if(userVotes.at(i) == "3")
+                {
+                    sixth++;
+                }
+                else if(userVotes.at(i) == "5")
+                {
+                    seventh++;
+                }
+                else if(userVotes.at(i) == "8")
+                {
+                    eigth++;
+                }
+
+                qDebug()<<userVotes.at(i);
+            }
+
+            *set0<<first;
+            *set1<<second;
+            *set2<<third;
+            *set3<<fourth;
+            *set4<<fifth;
+            *set5<<sixth;
+            *set6<<seventh;
+            *set7<<eigth;
+
+            QBarSeries *series0 = new QBarSeries();
+            QBarSeries *series1 = new QBarSeries();
+            QBarSeries *series2 = new QBarSeries();
+            QBarSeries *series3 = new QBarSeries();
+            QBarSeries *series4 = new QBarSeries();
+            QBarSeries *series5 = new QBarSeries();
+            QBarSeries *series6 = new QBarSeries();
+            QBarSeries *series7 = new QBarSeries();
+
+            QList<QBarSeries *> allSeries;
+            series0->append(set0);
+            allSeries.append(series0);
+            series1->append(set1);
+            allSeries.append(series1);
+            series2->append(set2);
+            allSeries.append(series2);
+            series3->append(set3);
+            allSeries.append(series3);
+            series4->append(set4);
+            allSeries.append(series4);
+            series5->append(set5);
+            allSeries.append(series5);
+            series6->append(set6);
+            allSeries.append(series6);
+            series7->append(set7);
+            allSeries.append(series7);
+
+            makechart(allSeries);
+//----------------------REWRITE ABOVE----------------------//
+        }
+
+    }
     else
     {
         ui->textEdit_log->append(QString("%1").arg(msg));
@@ -208,13 +320,8 @@ void pokerserver::on_pushButton_Shuffle_clicked()
     int last = currentUsers.count();
     for(int i = 1; i<currentUsers.count(); i++)
     {
-        qDebug()<<"Current Index: ";
-        qDebug()<<i;
-
         gen = rand.bounded(first, last);
 
-        qDebug()<<"Random Num: ";
-        qDebug()<<gen;
         currentUsers.swap(i, gen);
     }
 
@@ -228,6 +335,7 @@ void pokerserver::on_pushButton_Shuffle_clicked()
     QList<QTcpSocket *> clients = server->getClients();
     for(int i = 0; i < clients.count(); i++)
     {
+
         server->sendToClient(clients.at(i), "/CLEARLIST/");
         for(int j = 0; j < currentUsers.count(); j++)
         {
@@ -235,4 +343,39 @@ void pokerserver::on_pushButton_Shuffle_clicked()
         }
         server->sendToClient(clients.at(i), "/ENDLIST/");
     }
+}
+
+
+
+
+
+
+void pokerserver::makechart(QList<QBarSeries *> allSeries)
+{
+    userVotes.clear();
+    QLayoutItem * item = ui->chartLayoutS->takeAt(0);
+    if(item->widget())
+            delete item->widget();
+
+    QChart* chart = new QChart();
+    for(int i = 0; i < allSeries.count(); i++)
+    {
+        chart->addSeries(allSeries[i]);
+    }
+    chart->setTitle("Votes");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    QStringList categories;
+    categories << "?" << "0" << "1/2" << "1" << "2" << "3" << "5" << "8";
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+
+    axisX->append(categories);
+    chart->createDefaultAxes();
+    chart->setAxisX(axisX);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    ui->chartLayoutS->addWidget(chartView);
+
+//------------------------EVERYTHING ABOVE--------------------
+
 }

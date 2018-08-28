@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QAbstractSocket>
 #include <QMessageBox>
+#include <QtCharts>
 #include "clientStuff.h"
 
 namespace Ui {
@@ -30,7 +31,19 @@ private slots:
     void on_pushButton_disconnect_clicked();
     void on_pushButton_Exit_clicked();
 
+
+    void on_pushButton_Vote8_clicked();
+    void on_pushButton_Vote7_clicked();
+    void on_pushButton_Vote6_clicked();
+    void on_pushButton_Vote5_clicked();
+    void on_pushButton_Vote4_clicked();
+    void on_pushButton_Vote3_clicked();
+    void on_pushButton_Vote2_clicked();
+    void on_pushButton_Vote1_clicked();
+    void on_pushButton_Vote_clicked();
+
 private:
+    QString voteNum;
     QString username;
     QString roomname;
     QList<QString> currentUsers;
