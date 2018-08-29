@@ -40,7 +40,7 @@ void ServerStuff::readClient()
 
         emit gotNewMesssage(str, clientSocket);
 
-        if(!str.startsWith("/USER/") && !str.startsWith("/DCON/") /* && !str.startsWith("/VOTEN/")*/)
+        if(!str.startsWith("/USER/") && !str.startsWith("/DCON/") && !str.startsWith("/VOTEN/"))
         {
             foreach(QTcpSocket *clientSocketA, clients)
             {

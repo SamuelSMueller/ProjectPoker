@@ -41,6 +41,7 @@ private slots:
     void on_pushButton_Vote2_clicked();
     void on_pushButton_Vote1_clicked();
     void on_pushButton_Vote_clicked();
+    void makechart(QList<QBarSeries *> series);
 
 private:
     QString voteNum;
@@ -49,6 +50,7 @@ private:
     QList<QString> currentUsers;
     Ui::pokerclient *ui;
     ClientStuff *client;
+    QList<QString> userVotes;
 };
 
 #endif // POKERCLIENT_H

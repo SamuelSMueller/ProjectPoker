@@ -12,44 +12,10 @@ pokerclient::pokerclient(QWidget *parent, QString uName) :
     username = uName;
     ui->setupUi(this);
 
+    QList<QBarSeries *> Qseries;
+    Qseries.append(Qseries);
 
-    QBarSet *set0 = new QBarSet("1");
-    QBarSet *set1 = new QBarSet("2");
-    QBarSet *set2 = new QBarSet("3");
-    QBarSet *set3 = new QBarSet("4");
-    QBarSet *set4 = new QBarSet("5");
-
-    *set0 << 1 << 1 << 2;
-    *set1 << 3 << 1 << 2;
-    *set2 << 4 << 0 << 2;
-    *set3 << 1 << 3 << 2;
-    *set4 << 2 << 2 << 2;
-
-    QBarSeries *series = new QBarSeries();
-    series->append(set0);
-    series->append(set1);
-    series->append(set2);
-    series->append(set3);
-    series->append(set4);
-
-
-    QChart* chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("Votes");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-    QStringList categories;
-    categories << "First" << "Second" << "Third" << "Fourth" << "Fifth";
-    QBarCategoryAxis *axis = new QBarCategoryAxis();
-    axis->append(categories);
-    chart->createDefaultAxes();
-    chart->setAxisX(axis, series);
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignCenter);
-
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    ui->horizontalLayout_5->addWidget(chartView);
-
+    makechart(Qseries);
 
     ui->pushButton_disconnect->setVisible(false);
 
@@ -121,6 +87,130 @@ void pokerclient::receivedSomething(QString msg)
         MainWindow * mainWindow = new MainWindow;
         mainWindow->show();
         close();
+    }
+    else if(msg == "/STVOTE/")
+    {
+        userVotes.clear();
+    }
+    else if(msg.startsWith("/VOTEN/"))
+    {
+        msg.remove(0,7);
+        userVotes.append(msg);
+    }
+    else if(msg == "/ENDVOTE/")
+    {
+        //------WRITTEN TERRIBLY, LATE AT NIGHT, AFTER HOMEWORK. WILL BE REWRITTEN LATER--------//
+        int first = 0;
+        int second = 0;
+        int third = 0;
+        int fourth = 0;
+        int fifth = 0;
+        int sixth = 0;
+        int seventh = 0;
+        int eigth = 0;
+
+        QBarSet *set0 = new QBarSet("?");
+        QBarSet *set1 = new QBarSet("0");
+        QBarSet *set2 = new QBarSet("1/2");
+        QBarSet *set3 = new QBarSet("1");
+        QBarSet *set4 = new QBarSet("2");
+        QBarSet *set5 = new QBarSet("3");
+        QBarSet *set6 = new QBarSet("5");
+        QBarSet *set7 = new QBarSet("8");
+
+        for(int i = 0; i<userVotes.count(); i++)
+        {
+            if(userVotes.at(i) == "?")
+            {
+                first++;
+            }
+            else if(userVotes.at(i) == "0")
+            {
+                second++;
+            }
+            else if(userVotes.at(i) == "1/2")
+            {
+                third++;
+            }
+            else if(userVotes.at(i) == "1")
+            {
+                fourth++;
+            }
+            else if(userVotes.at(i) == "2")
+            {
+                fifth++;
+            }
+            else if(userVotes.at(i) == "3")
+            {
+                sixth++;
+            }
+            else if(userVotes.at(i) == "5")
+            {
+                seventh++;
+            }
+            else if(userVotes.at(i) == "8")
+            {
+                eigth++;
+            }
+
+
+        }
+
+        *set0<<first;
+        *set1<<second;
+        *set2<<third;
+        *set3<<fourth;
+        *set4<<fifth;
+        *set5<<sixth;
+        *set6<<seventh;
+        *set7<<eigth;
+
+        QBarSeries *series0 = new QBarSeries();
+        QBarSeries *series1 = new QBarSeries();
+        QBarSeries *series2 = new QBarSeries();
+        QBarSeries *series3 = new QBarSeries();
+        QBarSeries *series4 = new QBarSeries();
+        QBarSeries *series5 = new QBarSeries();
+        QBarSeries *series6 = new QBarSeries();
+        QBarSeries *series7 = new QBarSeries();
+
+        QList<QBarSeries *> allSeries;
+
+        series0->append(set0);
+        series0->setLabelsVisible(true);
+
+        allSeries.append(series0);
+        series1->append(set1);
+        series1->setLabelsVisible(true);
+
+        allSeries.append(series1);
+        series2->append(set2);
+        series2->setLabelsVisible(true);
+
+        allSeries.append(series2);
+        series3->append(set3);
+        series3->setLabelsVisible(true);
+
+        allSeries.append(series3);
+        series4->append(set4);
+        series4->setLabelsVisible(true);
+
+        allSeries.append(series4);
+        series5->append(set5);
+        series5->setLabelsVisible(true);
+
+        allSeries.append(series5);
+        series6->append(set6);
+        series6->setLabelsVisible(true);
+
+        allSeries.append(series6);
+        series7->append(set7);
+        series7->setLabelsVisible(true);
+
+        allSeries.append(series7);
+
+        makechart(allSeries);
+        //----------------------REWRITE ABOVE----------------------//
     }
     else
     {
@@ -263,4 +353,42 @@ void pokerclient::on_pushButton_Vote_clicked()
     out << quint16(arrBlock.size() - sizeof(quint16));
 
     client->tcpSocket->write(arrBlock);
+}
+
+
+
+void pokerclient::makechart(QList<QBarSeries *> allSeries)
+{
+    userVotes.clear();
+    QLayoutItem * item = ui->horizontalLayout_5->takeAt(0);
+    if(item->widget())
+            delete item->widget();
+
+    QChart* chart = new QChart();
+    for(int i = 0; i < allSeries.count(); i++)
+    {
+        chart->addSeries(allSeries[i]);
+    }
+    chart->setTitle("Votes");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QStringList categories;
+    categories << "?" << "0" << "1/2" << "1" << "2" << "3" << "5" << "8";
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    QValueAxis *axisY = new QValueAxis();
+
+    axisY->setMinorTickCount(-1);
+    axisY->setLabelFormat("%i");
+    axisX->append(categories);
+
+    chart->createDefaultAxes();
+
+    chart->setAxisX(axisX);
+    chart->setAxisY(axisY);
+    chart->legend()->setVisible(false);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    ui->horizontalLayout_5->addWidget(chartView);
 }

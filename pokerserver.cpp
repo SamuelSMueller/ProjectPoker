@@ -184,6 +184,18 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
         qDebug()<<msg;
         if(userVotes.count() == (currentUsers.count()-1))
         {
+
+            QList<QTcpSocket *> clients = server->getClients();
+            for(int i = 0; i < clients.count(); i++)
+                server->sendToClient(clients.at(i), "/STVOTE/");
+
+            for(int j = 0; j < userVotes.count(); j++)
+            {
+                QString sndVote = ("/VOTEN/" + userVotes.at(j));
+                for(int i = 0; i < clients.count(); i++)
+                    server->sendToClient(clients.at(i), sndVote);
+            }
+
             //------WRITTEN TERRIBLY, LATE AT NIGHT, AFTER HOMEWORK. WILL BE REWRITTEN LATER--------//
             int first = 0;
             int second = 0;
@@ -239,7 +251,6 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
                 }
 
 
-                qDebug()<<userVotes.at(i);
             }
 
             *set0<<first;
@@ -296,6 +307,9 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
             allSeries.append(series7);
 
             makechart(allSeries);
+
+            for(int i = 0; i < clients.count(); i++)
+                server->sendToClient(clients.at(i), "/ENDVOTE/");
             //----------------------REWRITE ABOVE----------------------//
         }
 
@@ -405,6 +419,7 @@ void pokerserver::makechart(QList<QBarSeries *> allSeries)
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     ui->chartLayoutS->addWidget(chartView);
+
 
 //------------------------EVERYTHING ABOVE--------------------
 
