@@ -8,8 +8,11 @@ pokerserver::pokerserver(QWidget *parent,  QString rName) :
     ui(new Ui::pokerserver)
 {
     ui->setupUi(this);
-    QList<QBarSeries *> series;
-    makechart(series);
+    QList<QBarSeries *> Qseries;
+    Qseries.append(Qseries);
+
+    makechart(Qseries);
+
     roomname = rName;
     server = new ServerStuff(this, roomname);
 
@@ -235,6 +238,7 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
                     eigth++;
                 }
 
+
                 qDebug()<<userVotes.at(i);
             }
 
@@ -257,25 +261,42 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
             QBarSeries *series7 = new QBarSeries();
 
             QList<QBarSeries *> allSeries;
+
             series0->append(set0);
+            series0->setLabelsVisible(true);
+
             allSeries.append(series0);
             series1->append(set1);
+            series1->setLabelsVisible(true);
+
             allSeries.append(series1);
             series2->append(set2);
+            series2->setLabelsVisible(true);
+
             allSeries.append(series2);
             series3->append(set3);
+            series3->setLabelsVisible(true);
+
             allSeries.append(series3);
             series4->append(set4);
+            series4->setLabelsVisible(true);
+
             allSeries.append(series4);
             series5->append(set5);
+            series5->setLabelsVisible(true);
+
             allSeries.append(series5);
             series6->append(set6);
+            series6->setLabelsVisible(true);
+
             allSeries.append(series6);
             series7->append(set7);
+            series7->setLabelsVisible(true);
+
             allSeries.append(series7);
 
             makechart(allSeries);
-//----------------------REWRITE ABOVE----------------------//
+            //----------------------REWRITE ABOVE----------------------//
         }
 
     }
@@ -364,13 +385,22 @@ void pokerserver::makechart(QList<QBarSeries *> allSeries)
     }
     chart->setTitle("Votes");
     chart->setAnimationOptions(QChart::SeriesAnimations);
+
     QStringList categories;
     categories << "?" << "0" << "1/2" << "1" << "2" << "3" << "5" << "8";
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
 
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    QValueAxis *axisY = new QValueAxis();
+
+    axisY->setMinorTickCount(-1);
+    axisY->setLabelFormat("%i");
     axisX->append(categories);
+
     chart->createDefaultAxes();
+
     chart->setAxisX(axisX);
+    chart->setAxisY(axisY);
+    chart->legend()->setVisible(false);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
