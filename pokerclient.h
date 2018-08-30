@@ -5,6 +5,7 @@
 #include <QAbstractSocket>
 #include <QMessageBox>
 #include <QtCharts>
+#include <QTime>
 #include "clientStuff.h"
 
 namespace Ui {
@@ -16,16 +17,17 @@ class pokerclient : public QDialog
     Q_OBJECT
 
 public:
-    explicit pokerclient(QWidget *parent = nullptr, QString uName = "username");
+    explicit pokerclient(QWidget *parent = nullptr, QString uName = "user");
     ~pokerclient();
-    void setRoomname(QString roomname);
+
 
 public slots:
     void setStatus(bool newStatus);
     void receivedSomething(QString msg);
     void gotError(QAbstractSocket::SocketError err);
+    void setPassword(QString pass);
 
-private slots:
+    private slots:
     void on_pushButton_send_clicked();
     void on_pushButton_connect_clicked();
     void on_pushButton_disconnect_clicked();
@@ -44,13 +46,14 @@ private slots:
     void makechart(QList<QBarSeries *> series);
 
 private:
+    bool voted;
     QString voteNum;
     QString username;
-    QString roomname;
     QList<QString> currentUsers;
     Ui::pokerclient *ui;
     ClientStuff *client;
     QList<QString> userVotes;
+    QString password;
 };
 
 #endif // POKERCLIENT_H

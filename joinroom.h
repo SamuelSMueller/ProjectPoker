@@ -21,10 +21,12 @@ private slots:
 
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
+    void on_checkBox_stateChanged(int arg1);
 
 private:
     QString username;
     Ui::joinroom *ui;
+    QString password;
 };
 
 #endif // JOINROOM_H

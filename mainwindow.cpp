@@ -20,8 +20,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     QString username = ui->lineEdit->text();
-//    qDebug() << username;
-    createroom * crRm = new createroom;
+    createroom * crRm = new createroom();
     crRm->setUsername(username);
     crRm->show();
     close();
@@ -31,7 +30,6 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     QString username = ui->lineEdit->text();
-//    qDebug() << username;
     joinroom * jnRm = new joinroom;
     jnRm->setUsername(username);
     jnRm->show();

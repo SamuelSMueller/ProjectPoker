@@ -1,9 +1,8 @@
 #include "serverStuff.h"
 
-ServerStuff::ServerStuff(QObject *pwgt, QString rName) : QObject(pwgt), m_nNextBlockSize(0)
+ServerStuff::ServerStuff(QObject *pwgt) : QObject(pwgt), m_nNextBlockSize(0)
 {
     tcpServer = new QTcpServer(this);
-    roomname = rName;
 }
 
 QList<QTcpSocket *> ServerStuff::getClients()
@@ -40,7 +39,7 @@ void ServerStuff::readClient()
 
         emit gotNewMesssage(str, clientSocket);
 
-        if(!str.startsWith("/USER/") && !str.startsWith("/DCON/") && !str.startsWith("/VOTEN/"))
+        if(!str.startsWith("/USER/") && !str.startsWith("/DCON/") && !str.startsWith("/VOTEN/") && !str.startsWith("/PASS/"))
         {
             foreach(QTcpSocket *clientSocketA, clients)
             {

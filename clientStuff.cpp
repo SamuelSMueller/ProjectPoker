@@ -33,7 +33,6 @@ void ClientStuff::connect2host()
 
 void ClientStuff::connectionTimeout()
 {
-    //qDebug() << tcpSocket->state();
     if(tcpSocket->state() == QAbstractSocket::ConnectingState)
     {
         tcpSocket->abort();
@@ -82,7 +81,6 @@ void ClientStuff::closeConnection()
 {
     timeoutTimer->stop();
 
-    //qDebug() << tcpSocket->state();
     disconnect(tcpSocket, &QTcpSocket::connected, nullptr, nullptr);
     disconnect(tcpSocket, &QTcpSocket::readyRead, nullptr, nullptr);
 

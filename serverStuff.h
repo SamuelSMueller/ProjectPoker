@@ -11,7 +11,7 @@ class ServerStuff : public QObject
     Q_OBJECT
 
 public:
-    ServerStuff(QObject *pwgt, QString rName);
+    ServerStuff(QObject *pwgt);
     QTcpServer *tcpServer;
     QList<QTcpSocket *> getClients();
 
@@ -28,7 +28,6 @@ signals:
 private:
     quint16 m_nNextBlockSize;
     QList<QTcpSocket*> clients;
-    QString roomname;
 };
 
 #endif // SERVERSTUFF_H

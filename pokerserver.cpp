@@ -3,7 +3,7 @@
 #include "mainwindow.h"
 #include "info.h"
 
-pokerserver::pokerserver(QWidget *parent,  QString rName) :
+pokerserver::pokerserver(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::pokerserver)
 {
@@ -13,8 +13,13 @@ pokerserver::pokerserver(QWidget *parent,  QString rName) :
 
     makechart(Qseries);
 
-    roomname = rName;
-    server = new ServerStuff(this, roomname);
+    ui->progressBar->setRange(0,0);
+    ui->progressBar->setValue(0);
+
+    ui->pushButton_Reset->setText("Start Vote");
+    voteComplete = false;
+
+    server = new ServerStuff(this);
 
     connect(server, &ServerStuff::gotNewMesssage,
             this, &pokerserver::gotNewMesssage);
@@ -43,10 +48,7 @@ void pokerserver::on_pushButton_startServer_clicked()
         return;
     }
     connect(server->tcpServer, &QTcpServer::newConnection, server, &ServerStuff::newConnection);
-    ui->textEdit_log->append(QString("<font color=\"green\"><b> %1 %2 </b></font>")
-                .arg(roomname)
-                .arg(tr(" is opened."))
-                );
+    ui->textEdit_log->append(QString("<b> Room is opened. </b>"));
     ui->listWidget->addItem("Admin: " + username);
 }
 
@@ -64,10 +66,7 @@ void pokerserver::on_pushButton_stopServer_clicked()
         }
 
         server->tcpServer->close();
-        ui->textEdit_log->append(QString("<font color=\"green\"><b> %1 %2 </b></font>")
-                                 .arg(roomname)
-                                 .arg(tr(" is closed."))
-                                 );
+        ui->textEdit_log->append(QString("<b> Room is closed. </b>"));
 
         currentUsers.clear();
         ui->listWidget->clear();
@@ -85,7 +84,7 @@ void pokerserver::on_pushButton_testConn_clicked()
     {
         ui->textEdit_log->append(
                     QString("%1 %2")
-                    .arg("Room is opened, number of current players:")
+                    .arg("Room is opened, number of current members:")
                     .arg(QString::number(server->getClients().count()+1))
                     );
     }
@@ -101,53 +100,70 @@ void pokerserver::on_pushButton_testConn_clicked()
 
 void pokerserver::smbConnectedToServer()
 {
-  ui->textEdit_log->append("A new player has joined.");
+ // ui->textEdit_log->append("A new player has joined.");
 }
 
 void pokerserver::smbDisconnectedFromServer()
 {
-    ui->textEdit_log->append("A player has left.");
+   // ui->textEdit_log->append("A player has left.");
 }
 
 void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
 {
     if(msg.startsWith("/USER/"))
     {
-        qDebug()<<"CHECK 1";
-        msg.remove(0,6);
-        if(currentUsers.isEmpty())
+        QStringList conString = msg.split('-');
+        QString userString = conString[0];
+        QString passString = conString[1];
+
+        passString.remove(0,6);
+        if(passString != password)
         {
-            currentUsers.append("Admin: "+username);
+            server->sendToClient(clientSocket, "/ERRPASS/");
         }
 
-        int j = currentUsers.indexOf(("Player: "+msg));
-        QList<QTcpSocket *> clients = server->getClients();
-        qDebug()<<"CHECK 2";
-        if(j == -1)
+        else
         {
-           currentUsers.append("Player: "+msg);
-        }
-
-        else if(j != -1)
-        {
-            server->sendToClient(clientSocket, "/ERRNAME/");
-        }
-
-        ui->listWidget->clear();
-
-        for(int i = 0; i<currentUsers.count(); i++)
-        {
-            ui->listWidget->addItem(currentUsers.at(i));
-        }
-
-        for(int i = 0; i < clients.count(); i++)
-        {
-            server->sendToClient(clients.at(i), "/CLEARLIST/");
-            for(int j = 0; j < currentUsers.count(); j++)
+            userString.remove(0,6);
+            if(currentUsers.isEmpty())
             {
-                server->sendToClient(clients.at(i), ("/ADDLIST/"+currentUsers.at(j)));
+                currentUsers.append("Admin: "+username);
             }
-            server->sendToClient(clients.at(i), "/ENDLIST/");
+
+            int j = currentUsers.indexOf(("Player: "+userString));
+            QList<QTcpSocket *> clients = server->getClients();
+
+            if(j == -1)
+            {
+               currentUsers.append("Player: "+userString);
+               if(voteComplete == false)
+               {
+                   int newMax = ui->progressBar->maximum();
+                   ui->progressBar->setMaximum(++newMax);
+               }
+            }
+
+            else if(j != -1)
+            {
+                server->sendToClient(clientSocket, "/ERRNAME/");
+            }
+
+            ui->listWidget->clear();
+
+            for(int i = 0; i<currentUsers.count(); i++)
+            {
+                ui->listWidget->addItem(currentUsers.at(i));
+            }
+
+            for(int i = 0; i < clients.count(); i++)
+            {
+                server->sendToClient(clients.at(i), "/CLEARLIST/");
+                for(int j = 0; j < currentUsers.count(); j++)
+                {
+                    server->sendToClient(clients.at(i), ("/ADDLIST/"+currentUsers.at(j)));
+                }
+                server->sendToClient(clients.at(i), "/ENDLIST/");
+            }
         }
     }
     else if(msg.startsWith("/DCON/"))
@@ -161,6 +177,10 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
             if(j != -1)
             {
                 currentUsers.removeAt(j);
+                int newValue = ui->progressBar->value();
+                ui->progressBar->setValue(--newValue);
+                int newMax = ui->progressBar->maximum();
+                ui->progressBar->setMaximum(--newMax);
             }
         names.clear();
         }
@@ -178,140 +198,150 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
     }
     else if(msg.startsWith("/VOTEN/"))
     {
-        msg.remove(0,7);
-        userVotes.append(msg);
-        qDebug()<<userVotes[0];
-        qDebug()<<msg;
-        if(userVotes.count() == (currentUsers.count()-1))
+        if(voteComplete == false)
         {
+            QStringList votingString = msg.split('-');
+            QString voteString = votingString[0];
+            QString whoString = votingString[1];
+            whoString.remove(0,6);
+            voteString.remove(0,7);
+            ui->textEdit_log->append(QString("<font color=\"green\"><b>%1</b> voted <b>%2</b>.</font>")
+                                     .arg(whoString)
+                                     .arg(voteString));
+            userVotes.append(voteString);
+            int newValue = ui->progressBar->value();
+            ui->progressBar->setValue(++newValue);
 
-            QList<QTcpSocket *> clients = server->getClients();
-            for(int i = 0; i < clients.count(); i++)
-                server->sendToClient(clients.at(i), "/STVOTE/");
-
-            for(int j = 0; j < userVotes.count(); j++)
+            if(userVotes.count() == (currentUsers.count()-1))
             {
-                QString sndVote = ("/VOTEN/" + userVotes.at(j));
+
+                QList<QTcpSocket *> clients = server->getClients();
                 for(int i = 0; i < clients.count(); i++)
-                    server->sendToClient(clients.at(i), sndVote);
+                    server->sendToClient(clients.at(i), "/STVOTE/");
+
+                for(int j = 0; j < userVotes.count(); j++)
+                {
+                    QString sndVote = ("/VOTEN/" + userVotes.at(j));
+                    for(int i = 0; i < clients.count(); i++)
+                        server->sendToClient(clients.at(i), sndVote);
+                }
+
+                //------WRITTEN TERRIBLY, LATE AT NIGHT, AFTER HOMEWORK. WILL BE REWRITTEN LATER--------//
+                int first = 0;
+                int second = 0;
+                int third = 0;
+                int fourth = 0;
+                int fifth = 0;
+                int sixth = 0;
+                int seventh = 0;
+                int eigth = 0;
+
+                QBarSet *set0 = new QBarSet("?");
+                QBarSet *set1 = new QBarSet("0");
+                QBarSet *set2 = new QBarSet("1/2");
+                QBarSet *set3 = new QBarSet("1");
+                QBarSet *set4 = new QBarSet("2");
+                QBarSet *set5 = new QBarSet("3");
+                QBarSet *set6 = new QBarSet("5");
+                QBarSet *set7 = new QBarSet("8");
+
+                for(int i = 0; i<userVotes.count(); i++)
+                {
+                    if(userVotes.at(i) == "?")
+                    {
+                        first++;
+                    }
+                    else if(userVotes.at(i) == "0")
+                    {
+                        second++;
+                    }
+                    else if(userVotes.at(i) == "1/2")
+                    {
+                        third++;
+                    }
+                    else if(userVotes.at(i) == "1")
+                    {
+                        fourth++;
+                    }
+                    else if(userVotes.at(i) == "2")
+                    {
+                        fifth++;
+                    }
+                    else if(userVotes.at(i) == "3")
+                    {
+                        sixth++;
+                    }
+                    else if(userVotes.at(i) == "5")
+                    {
+                        seventh++;
+                    }
+                    else if(userVotes.at(i) == "8")
+                    {
+                        eigth++;
+                    }
+
+                }
+
+                *set0<<first;
+                *set1<<second;
+                *set2<<third;
+                *set3<<fourth;
+                *set4<<fifth;
+                *set5<<sixth;
+                *set6<<seventh;
+                *set7<<eigth;
+
+                QBarSeries *series0 = new QBarSeries();
+                QBarSeries *series1 = new QBarSeries();
+                QBarSeries *series2 = new QBarSeries();
+                QBarSeries *series3 = new QBarSeries();
+                QBarSeries *series4 = new QBarSeries();
+                QBarSeries *series5 = new QBarSeries();
+                QBarSeries *series6 = new QBarSeries();
+                QBarSeries *series7 = new QBarSeries();
+
+                QList<QBarSeries *> allSeries;
+
+                series0->append(set0);
+                series0->setLabelsVisible(true);
+
+                allSeries.append(series0);
+                series1->append(set1);
+                series1->setLabelsVisible(true);
+
+                allSeries.append(series1);
+                series2->append(set2);
+                series2->setLabelsVisible(true);
+
+                allSeries.append(series2);
+                series3->append(set3);
+                series3->setLabelsVisible(true);
+
+                allSeries.append(series3);
+                series4->append(set4);
+                series4->setLabelsVisible(true);
+
+                allSeries.append(series4);
+                series5->append(set5);
+                series5->setLabelsVisible(true);
+
+                allSeries.append(series5);
+                series6->append(set6);
+                series6->setLabelsVisible(true);
+
+                allSeries.append(series6);
+                series7->append(set7);
+                series7->setLabelsVisible(true);
+
+                allSeries.append(series7);
+
+                makechart(allSeries);
+
+                for(int i = 0; i < clients.count(); i++)
+                    server->sendToClient(clients.at(i), "/ENDVOTE/");
+                //----------------------REWRITE ABOVE----------------------//
             }
-
-            //------WRITTEN TERRIBLY, LATE AT NIGHT, AFTER HOMEWORK. WILL BE REWRITTEN LATER--------//
-            int first = 0;
-            int second = 0;
-            int third = 0;
-            int fourth = 0;
-            int fifth = 0;
-            int sixth = 0;
-            int seventh = 0;
-            int eigth = 0;
-
-            QBarSet *set0 = new QBarSet("?");
-            QBarSet *set1 = new QBarSet("0");
-            QBarSet *set2 = new QBarSet("1/2");
-            QBarSet *set3 = new QBarSet("1");
-            QBarSet *set4 = new QBarSet("2");
-            QBarSet *set5 = new QBarSet("3");
-            QBarSet *set6 = new QBarSet("5");
-            QBarSet *set7 = new QBarSet("8");
-
-            for(int i = 0; i<userVotes.count(); i++)
-            {
-                if(userVotes.at(i) == "?")
-                {
-                    first++;
-                }
-                else if(userVotes.at(i) == "0")
-                {
-                    second++;
-                }
-                else if(userVotes.at(i) == "1/2")
-                {
-                    third++;
-                }
-                else if(userVotes.at(i) == "1")
-                {
-                    fourth++;
-                }
-                else if(userVotes.at(i) == "2")
-                {
-                    fifth++;
-                }
-                else if(userVotes.at(i) == "3")
-                {
-                    sixth++;
-                }
-                else if(userVotes.at(i) == "5")
-                {
-                    seventh++;
-                }
-                else if(userVotes.at(i) == "8")
-                {
-                    eigth++;
-                }
-
-
-            }
-
-            *set0<<first;
-            *set1<<second;
-            *set2<<third;
-            *set3<<fourth;
-            *set4<<fifth;
-            *set5<<sixth;
-            *set6<<seventh;
-            *set7<<eigth;
-
-            QBarSeries *series0 = new QBarSeries();
-            QBarSeries *series1 = new QBarSeries();
-            QBarSeries *series2 = new QBarSeries();
-            QBarSeries *series3 = new QBarSeries();
-            QBarSeries *series4 = new QBarSeries();
-            QBarSeries *series5 = new QBarSeries();
-            QBarSeries *series6 = new QBarSeries();
-            QBarSeries *series7 = new QBarSeries();
-
-            QList<QBarSeries *> allSeries;
-
-            series0->append(set0);
-            series0->setLabelsVisible(true);
-
-            allSeries.append(series0);
-            series1->append(set1);
-            series1->setLabelsVisible(true);
-
-            allSeries.append(series1);
-            series2->append(set2);
-            series2->setLabelsVisible(true);
-
-            allSeries.append(series2);
-            series3->append(set3);
-            series3->setLabelsVisible(true);
-
-            allSeries.append(series3);
-            series4->append(set4);
-            series4->setLabelsVisible(true);
-
-            allSeries.append(series4);
-            series5->append(set5);
-            series5->setLabelsVisible(true);
-
-            allSeries.append(series5);
-            series6->append(set6);
-            series6->setLabelsVisible(true);
-
-            allSeries.append(series6);
-            series7->append(set7);
-            series7->setLabelsVisible(true);
-
-            allSeries.append(series7);
-
-            makechart(allSeries);
-
-            for(int i = 0; i < clients.count(); i++)
-                server->sendToClient(clients.at(i), "/ENDVOTE/");
-            //----------------------REWRITE ABOVE----------------------//
-        }
+        } //end if(voteComplete == false)
 
     }
     else
@@ -346,8 +376,14 @@ void pokerserver::setUsername(QString uName)
     username = uName;
 }
 
+void pokerserver::setPassword(QString pass)
+{
+    password = pass;
+}
+
 void pokerserver::on_pushButton_Shuffle_clicked()
-{   QTime time = QTime::currentTime();
+{
+    QTime time = QTime::currentTime();
 
     QRandomGenerator rand((uint)time.msec());
     int gen;
@@ -419,8 +455,18 @@ void pokerserver::makechart(QList<QBarSeries *> allSeries)
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     ui->chartLayoutS->addWidget(chartView);
+    voteComplete = true;
+}
 
+void pokerserver::on_pushButton_Reset_clicked()
+{
+    ui->pushButton_Reset->setText("Reset Vote");
 
-//------------------------EVERYTHING ABOVE--------------------
+    voteComplete = false;
+    userVotes.clear();
+    QList<QTcpSocket *> clients = server->getClients();
+    for(int i = 0; i < clients.count(); i++)
+        server->sendToClient(clients.at(i), "/RESETVOTE/");
+    ui->progressBar->setValue(0);
 
 }

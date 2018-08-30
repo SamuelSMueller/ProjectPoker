@@ -20,10 +20,10 @@ class pokerserver : public QDialog
     Q_OBJECT
 
 public:
-    explicit pokerserver(QWidget *parent = nullptr, QString rName = "roomname");
+    explicit pokerserver(QWidget *parent = nullptr);
     ~pokerserver();
     void setUsername(QString username);
-    void setRoomname(QString roomname);
+    void setPassword(QString pass);
 
 private slots:
     void on_pushButton_stopServer_clicked();
@@ -37,14 +37,16 @@ private slots:
     void on_pushButton_Shuffle_clicked();
     void makechart(QList<QBarSeries *> series);
 
+    void on_pushButton_Reset_clicked();
 
 private:
     QString username;
-    QString roomname;
     QList<QString> currentUsers;
     Ui::pokerserver *ui;
     ServerStuff *server;
     QList<QString> userVotes;
+    QString password;
+    bool voteComplete;
 };
 
 #endif // POKERSERVER_H

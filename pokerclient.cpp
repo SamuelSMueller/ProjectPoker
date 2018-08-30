@@ -10,7 +10,9 @@ pokerclient::pokerclient(QWidget *parent, QString uName) :
     ui(new Ui::pokerclient)
 {
     username = uName;
+    voted = true;
     ui->setupUi(this);
+    voteNum = -1;
 
     QList<QBarSeries *> Qseries;
     Qseries.append(Qseries);
@@ -88,6 +90,18 @@ void pokerclient::receivedSomething(QString msg)
         mainWindow->show();
         close();
     }
+    else if(msg == "/ERRPASS/")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Your password is incorrect.");
+        msgBox.setInformativeText("Please rejoin with the correct password.");
+        msgBox.exec();
+        client->closeConnection();
+
+        MainWindow * mainWindow = new MainWindow;
+        mainWindow->show();
+        close();
+    }
     else if(msg == "/STVOTE/")
     {
         userVotes.clear();
@@ -96,6 +110,10 @@ void pokerclient::receivedSomething(QString msg)
     {
         msg.remove(0,7);
         userVotes.append(msg);
+    }
+    else if(msg == "/RESETVOTE/")
+    {
+        voted = false;
     }
     else if(msg == "/ENDVOTE/")
     {
@@ -251,7 +269,7 @@ void pokerclient::on_pushButton_connect_clicked()
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
     //out.setVersion(QDataStream::Qt_5_10);
-    out << quint16(0) << ("/USER/"+username);
+    out << quint16(0) << ("/USER/"+username+"-/PASS/"+password);
 
     out.device()->seek(0);
     out << quint16(arrBlock.size() - sizeof(quint16));
@@ -275,6 +293,11 @@ void pokerclient::on_pushButton_send_clicked()
 
 void pokerclient::on_pushButton_disconnect_clicked()
 {
+    if(voted == false)
+    {
+        voteNum = -1;
+        on_pushButton_Vote_clicked(); //make sure if a user leaves it doesn't break the current vote, sends default -1 vote
+    }
     //----------------------------------------------EVERYTHING BELOW
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
@@ -302,11 +325,6 @@ void pokerclient::on_pushButton_Exit_clicked()
     close();
 }
 
-
-void pokerclient::setRoomname(QString rName)
-{
-    roomname = rName;
-}
 
 
 void pokerclient::on_pushButton_Vote8_clicked()
@@ -344,17 +362,23 @@ void pokerclient::on_pushButton_Vote1_clicked()
 
 void pokerclient::on_pushButton_Vote_clicked()
 {
-    QByteArray arrBlock;
-    QDataStream out(&arrBlock, QIODevice::WriteOnly);
-    //out.setVersion(QDataStream::Qt_5_10);
-    out << quint16(0) << ("/VOTEN/" + voteNum);
+    if(voted == false)
+    {
+        QByteArray arrBlock;
+        QDataStream out(&arrBlock, QIODevice::WriteOnly);
+        //out.setVersion(QDataStream::Qt_5_10);
+        out << quint16(0) << ("/VOTEN/" + voteNum + "-/WHOS/" + username);
 
-    out.device()->seek(0);
-    out << quint16(arrBlock.size() - sizeof(quint16));
+        out.device()->seek(0);
+        out << quint16(arrBlock.size() - sizeof(quint16));
 
-    client->tcpSocket->write(arrBlock);
+        client->tcpSocket->write(arrBlock);
+        voted = true;
+        ui->textEdit_log->append("You have voted, your vote was " +voteNum+ ".");
+    }
+    else
+        ui->textEdit_log->append("Please wait for the admin to enable voting.");
 }
-
 
 
 void pokerclient::makechart(QList<QBarSeries *> allSeries)
@@ -391,4 +415,11 @@ void pokerclient::makechart(QList<QBarSeries *> allSeries)
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     ui->horizontalLayout_5->addWidget(chartView);
+}
+
+
+
+void pokerclient::setPassword(QString pass)
+{
+    password = pass;
 }
