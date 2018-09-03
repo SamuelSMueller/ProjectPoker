@@ -47,6 +47,7 @@ private:
     QList<QString> userVotes;
     QString password;
     bool voteComplete;
+    bool newProgress;
 };
 
 #endif // POKERSERVER_H

@@ -44,14 +44,14 @@ void pokerclient::setStatus(bool newStatus)
     if(newStatus)
     {
         ui->label_status->setText(
-                    tr("<font color=\"green\">In Room</font>"));
+                    tr("In Room"));
         ui->pushButton_connect->setVisible(false);
         ui->pushButton_disconnect->setVisible(true);
     }
     else
     {
         ui->label_status->setText(
-                tr("<font color=\"green\">Not In Room</font>"));
+                tr("Not In Room"));
         ui->pushButton_connect->setVisible(true);
         ui->pushButton_disconnect->setVisible(false);
     }
@@ -127,14 +127,42 @@ void pokerclient::receivedSomething(QString msg)
         int seventh = 0;
         int eigth = 0;
 
+        QString color1 = "#1cafa5";
+        QString color2 = "#196f64";
+        QString color3 = "#767676";
+        QList<QString> colors;
+        colors.append(color1);
+        colors.append(color2);
+        colors.append(color3);
+
+        QTime time = QTime::currentTime();
+        QRandomGenerator rand((uint)time.msec());
+
         QBarSet *set0 = new QBarSet("?");
+        int gen = rand.bounded(0, 2);
+        set0->setColor(colors[gen]);
+
         QBarSet *set1 = new QBarSet("0");
+        set1->setColor(colors[(++gen%3)]);
+
         QBarSet *set2 = new QBarSet("1/2");
+        set2->setColor(colors[(++gen%3)]);
+
         QBarSet *set3 = new QBarSet("1");
+        set3->setColor(colors[(++gen%3)]);
+
         QBarSet *set4 = new QBarSet("2");
+        set4->setColor(colors[(++gen%3)]);
+
         QBarSet *set5 = new QBarSet("3");
+        set5->setColor(colors[(++gen%3)]);
+
         QBarSet *set6 = new QBarSet("5");
+        set6->setColor(colors[(++gen%3)]);
+
         QBarSet *set7 = new QBarSet("8");
+        set7->setColor(colors[(++gen%3)]);
+
 
         for(int i = 0; i<userVotes.count(); i++)
         {
@@ -229,6 +257,11 @@ void pokerclient::receivedSomething(QString msg)
 
         makechart(allSeries);
         //----------------------REWRITE ABOVE----------------------//
+    }
+    else if(msg == "Room closed")
+    {
+        ui->textEdit_log->append(msg);
+        ui->listWidget->clear();
     }
     else
     {

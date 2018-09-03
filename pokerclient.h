@@ -5,6 +5,7 @@
 #include <QAbstractSocket>
 #include <QMessageBox>
 #include <QtCharts>
+#include <QRandomGenerator>
 #include <QTime>
 #include "clientStuff.h"
 

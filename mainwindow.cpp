@@ -7,9 +7,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    //TO DO - SET UP COLOR SCHEMES
-    //this->setStyleSheet("background:rgb(245,250,250);");
     ui->setupUi(this);
+    QPixmap pix("C:/Users/Samuel/Documents/Projects/ProjectPoker/logo.png");
+    ui->label_pic->setPixmap(pix.scaledToHeight(ui->label_pic->height()));
 }
 
 MainWindow::~MainWindow()

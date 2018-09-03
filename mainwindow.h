@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QString>
 #include <QDebug>
+#include <QIcon>
+#include <QPixmap>
 
 namespace Ui {
 class MainWindow;
@@ -17,12 +19,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
 private slots:
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
-
 private:
+
     Ui::MainWindow *ui;
 };
 

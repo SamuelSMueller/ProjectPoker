@@ -7,14 +7,27 @@ pokerserver::pokerserver(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::pokerserver)
 {
+    newProgress = true;
     ui->setupUi(this);
     QList<QBarSeries *> Qseries;
     Qseries.append(Qseries);
 
     makechart(Qseries);
 
-    ui->progressBar->setRange(0,0);
+    ui->progressBar->setRange(0,1);
     ui->progressBar->setValue(0);
+
+    ui->progressBar->setStyleSheet("QProgressBar {"
+                                       "border: 2px #767676;"
+                                       "border-radius: 10px;"
+                                       "text-align: center;"
+                                       "color: #1cafa5;"
+                                   "}"
+                                   "QProgressBar::chunk {"
+                                       "background-color: #1cafa5;"
+                                       "border-radius: 10px;"
+                                   "}"
+                                   );
 
     ui->pushButton_Reset->setText("Start Vote");
     voteComplete = false;
@@ -139,6 +152,9 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
                if(voteComplete == false)
                {
                    int newMax = ui->progressBar->maximum();
+                   if(newProgress == true)
+                       newProgress = false;
+                   else
                    ui->progressBar->setMaximum(++newMax);
                }
             }
@@ -180,7 +196,10 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
                 int newValue = ui->progressBar->value();
                 ui->progressBar->setValue(--newValue);
                 int newMax = ui->progressBar->maximum();
-                ui->progressBar->setMaximum(--newMax);
+                if(newMax > 1)
+                    ui->progressBar->setMaximum(--newMax);
+                else
+                    newProgress = true;
             }
         names.clear();
         }
@@ -212,6 +231,22 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
             int newValue = ui->progressBar->value();
             ui->progressBar->setValue(++newValue);
 
+            if(ui->progressBar->value()>=(((currentUsers.count()-1)/2)))
+            {
+                ui->progressBar->setStyleSheet("QProgressBar {"
+                                                   "border: 2px #767676;"
+                                                   "border-radius: 10px;"
+                                                   "text-align: center;"
+                                                   "color: #ffffff;"
+                                               "}"
+                                               "QProgressBar::chunk {"
+                                                   "background-color: #1cafa5;"
+                                                   "border-radius: 10px;"
+                                               "}"
+                                               );
+            }
+
+
             if(userVotes.count() == (currentUsers.count()-1))
             {
 
@@ -236,14 +271,41 @@ void pokerserver::gotNewMesssage(QString msg, QTcpSocket *clientSocket)
                 int seventh = 0;
                 int eigth = 0;
 
+                QString color1 = "#1cafa5";
+                QString color2 = "#196f64";
+                QString color3 = "#767676";
+                QList<QString> colors;
+                colors.append(color1);
+                colors.append(color2);
+                colors.append(color3);
+
+                QTime time = QTime::currentTime();
+                QRandomGenerator rand((uint)time.msec());
+
                 QBarSet *set0 = new QBarSet("?");
+                int gen = rand.bounded(0, 2);
+                set0->setColor(colors[gen]);
+
                 QBarSet *set1 = new QBarSet("0");
+                set1->setColor(colors[(++gen%3)]);
+
                 QBarSet *set2 = new QBarSet("1/2");
+                set2->setColor(colors[(++gen%3)]);
+
                 QBarSet *set3 = new QBarSet("1");
+                set3->setColor(colors[(++gen%3)]);
+
                 QBarSet *set4 = new QBarSet("2");
+                set4->setColor(colors[(++gen%3)]);
+
                 QBarSet *set5 = new QBarSet("3");
+                set5->setColor(colors[(++gen%3)]);
+
                 QBarSet *set6 = new QBarSet("5");
+                set6->setColor(colors[(++gen%3)]);
+
                 QBarSet *set7 = new QBarSet("8");
+                set7->setColor(colors[(++gen%3)]);
 
                 for(int i = 0; i<userVotes.count(); i++)
                 {
@@ -467,6 +529,19 @@ void pokerserver::on_pushButton_Reset_clicked()
     QList<QTcpSocket *> clients = server->getClients();
     for(int i = 0; i < clients.count(); i++)
         server->sendToClient(clients.at(i), "/RESETVOTE/");
+    ui->progressBar->setRange(0,clients.count());
     ui->progressBar->setValue(0);
+    ui->progressBar->setStyleSheet("QProgressBar {"
+                                       "border: 2px #767676;"
+                                       "border-radius: 10px;"
+                                       "text-align: center;"
+                                       "color: #1cafa5;"
+                                   "}"
+                                   "QProgressBar::chunk {"
+                                       "background-color: #1cafa5;"
+                                       "border-radius: 10px;"
+                                   "}"
+                                   );
+
 
 }
