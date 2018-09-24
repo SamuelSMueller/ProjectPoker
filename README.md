@@ -31,6 +31,6 @@ Currently operational. Allows for:
 -Player shuffling by room host
 
 
-To use this software over the internet, the source files must be downloaded and recompiled with the correct IP and PORT numbers in a header file "info.h"
+To use this software over the internet, the source files must be downloaded and recompiled with the correct IP and PORT numbers in the file "info.cpp"
 
 The current release of this project simply uses localhost for testing purposes.
